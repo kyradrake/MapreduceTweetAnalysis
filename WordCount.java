@@ -18,14 +18,28 @@ public class WordCount {
     public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable>{
 
         private final static IntWritable one = new IntWritable(1);
-        private Text word = new Text();
+        private Text time = new Text();
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            
+            /*
             StringTokenizer itr = new StringTokenizer(value.toString());
-                while (itr.hasMoreTokens()) {
+            while (itr.hasMoreTokens()) {
                 word.set(itr.nextToken());
                 context.write(word, one);
+            }
+            */
+            
+            StringTokenizer itr = new StringTokenizer(value.toString());
+            
+            //check to see if the line we're on is the time
+            if(itr.hasMoreTokens()){
+                if(itr.nextToken().equals("T")){
+                    itr.nextToken();
+                    time.set(itr.nextToken().substring(0, 2));
+                    context.write(time, one);
                 }
+            }
         }
     }
 
