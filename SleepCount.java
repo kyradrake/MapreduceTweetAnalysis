@@ -72,7 +72,7 @@ public class SleepCount {
         Configuration conf = new Configuration();
         conf.setInt(NLineInputFormat.LINES_PER_MAP, 4);
         Job job = Job.getInstance(conf, "sleep count");
-        job.setJarByClass(WordCount.class);
+        job.setJarByClass(SleepCount.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(IntSumReducer.class);
         job.setReducerClass(IntSumReducer.class);
