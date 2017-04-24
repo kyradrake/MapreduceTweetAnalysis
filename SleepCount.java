@@ -12,6 +12,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.input.NLineInputFormat;
 
 public class SleepCount {
 
@@ -33,23 +34,21 @@ public class SleepCount {
             StringTokenizer itr = new StringTokenizer(value.toString());
             
             //check to see if the line we're on is the time
-            if(itr.hasMoreTokens()){
-                if(itr.nextToken().equals("T")){
-                    itr.nextToken();
-                    time.set(itr.nextToken().substring(0, 2));
+            if(itr.nextToken().equals("T")){
+                itr.nextToken();
+                time.set(itr.nextToken().substring(0, 2));
 
-                    //check the remaining text for the word sleep
-                    Boolean containsSleep = false;
-                    while (itr.hasMoreTokens()) {
-                        if(itr.nextToken().equals("sleep")){
-                            containsSleep = true;
-                        }
+                //check the remaining text for the word sleep
+                Boolean containsSleep = false;
+                while (itr.hasMoreTokens()) {
+                    if(itr.nextToken().equals("sleep")){
+                        containsSleep = true;
                     }
+                }
 
-                    //if the tweet contains sleep, map
-                    if(containsSleep){
-                        context.write(time, one);
-                    }
+                //if the tweet contains sleep, map
+                if(containsSleep){
+                    context.write(time, one);
                 }
             }
         }
@@ -71,21 +70,16 @@ public class SleepCount {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
+        conf.set("textinputformat.record.delimiter","\n\n");
         Job job = Job.getInstance(conf, "sleep count");
+        job.getConfiguration().setInt(NLineInputFormat.LINES_PER_MAP, 4);
         job.setJarByClass(SleepCount.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(IntSumReducer.class);
         job.setReducerClass(IntSumReducer.class);
-        
-        //job.setInputFormatClass(NLineInputFormat.class);
-        
-        job.setInputFormatClass(NLineInputFormat.class);
-		job.getConfiguration().setInt("mapreduce.input.lineinputformat.linespermap", 4);
-        NLineInputFormat.addInputPath(job, new Path(args[0]));
-        
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
-        //FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
