@@ -80,8 +80,8 @@ public class SleepCount {
         //job.setInputFormatClass(NLineInputFormat.class);
         
         job.setInputFormatClass(NLineInputFormat.class);
-		NLineInputFormat.addInputPath(job, new Path(args[0]));
 		job.getConfiguration().setInt("mapreduce.input.lineinputformat.linespermap", 4);
+        NLineInputFormat.addInputPath(job, new Path(args[0]));
         
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
