@@ -70,13 +70,13 @@ public class SleepCount {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        conf.setInt(NLineInputFormat.LINES_PER_MAP, 4);
         Job job = Job.getInstance(conf, "sleep count");
         job.setJarByClass(SleepCount.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(IntSumReducer.class);
         job.setReducerClass(IntSumReducer.class);
         job.setInputFormatClass(NLineInputFormat.class);
+        NLineInputFormat.setNumLinesPerSplit(job, 4);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
