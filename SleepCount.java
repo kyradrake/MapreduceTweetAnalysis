@@ -75,8 +75,17 @@ public class SleepCount {
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(IntSumReducer.class);
         job.setReducerClass(IntSumReducer.class);
+        
+        /*
         job.setInputFormatClass(NLineInputFormat.class);
         NLineInputFormat.setNumLinesPerSplit(job, 4);
+        */
+        
+        job.setInputFormatClass(NLineInputFormat.class);
+        NLineInputFormat.addInputPath(job, new Path(args[0]));
+        job.getConfiguration().setInt("mapreduce.input.lineinputformat.linespermap", 4);
+        
+        
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
